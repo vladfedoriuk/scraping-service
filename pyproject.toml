@@ -9,6 +9,9 @@ license = "MIT"
 python = "^3.10"
 Django = "^4.0.4"
 psycopg2 = "^2.9.3"
+celery = {extras = ["redis"], version = "^5.2.6"}
+django-celery-results = "^2.3.1"
+django-jazzmin = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

@@ -7,3 +7,9 @@ services: ### bring up all the dependency services.
 
 down: ### bring down all the services
 	docker compose down --remove-orphans
+
+
+# celery
+
+celery-worker: ### spin up a celery worker process
+	celery -A scrapping worker -l info
