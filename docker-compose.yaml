@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:${REDIS_TAG:?The redis image tag must be set}
+    container_name: scrapping-redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-16379}:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - scrappingnet
+    profiles: [ "services" ]
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+  postgres:
+    image: postgres:${POSTGRES_TAG:?The postgres image tag must be set}
+    container_name: scrapping-postgres
+    restart: always
+    ports:
+      - "${POSTGRES_PORT:-15432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - scrappingnet
+    profiles: [ "services" ]
+    env_file:
+      - .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
+networks:
+  scrappingnet:
+
+volumes:
+  pgdata:
+  redisdata:
+
