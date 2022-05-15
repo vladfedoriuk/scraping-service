@@ -50,6 +50,7 @@ class Resource(
 
 class Integration(
     ActivatorModel,
+    TimeStampedModel,
     TitleSlugDescriptionModel,
 ):
     topic = models.ForeignKey(
@@ -103,3 +104,7 @@ class ScrappedData(TimeStampedModel):
     data = models.JSONField(
         verbose_name=_("data"), help_text=_("The scrapped data."), default=dict
     )
+
+    class Meta:
+        verbose_name = _("Scrapped Data")
+        verbose_name_plural = verbose_name
