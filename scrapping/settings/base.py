@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 PROJECT_APPS = [
     "user.apps.UserConfig",
+    "scrapper.apps.ScrapperConfig",
 ]
 
 INSTALLED_APPS = [
