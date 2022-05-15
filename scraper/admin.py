@@ -2,8 +2,8 @@ from operator import attrgetter
 
 from django.contrib import admin
 
-from scrapper.models import Topic, Resource, Integration, ScrappedData
-from scrapper.utils.admin import ReadOnlyAdminMixin
+from scraper.models import Topic, Resource, Integration, ScrappedData
+from scraper.utils.admin import ReadOnlyAdminMixin
 
 
 class IntegrationInline(admin.StackedInline):

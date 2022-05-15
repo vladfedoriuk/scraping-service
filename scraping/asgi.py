@@ -1,5 +1,5 @@
 """
-ASGI config for scrapping project.
+ASGI config for scraping project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scrapping.settings.dev")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "scraping.settings.dev")
 
 application = get_asgi_application()

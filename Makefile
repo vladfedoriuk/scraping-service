@@ -12,4 +12,4 @@ down: ### bring down all the services
 # celery
 
 celery-worker: ### spin up a celery worker process
-	celery -A scrapping worker -l info
+	celery -A scraping worker -l info

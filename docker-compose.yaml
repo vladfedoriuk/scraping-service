@@ -3,14 +3,14 @@ version: "3.9"
 services:
   redis:
     image: redis:${REDIS_TAG:?The redis image tag must be set}
-    container_name: scrapping-redis
+    container_name: scraping-redis
     restart: always
     ports:
       - "${REDIS_PORT:-16379}:6379"
     volumes:
       - redisdata:/data
     networks:
-      - scrappingnet
+      - scrapingnet
     profiles: [ "services" ]
     env_file:
       - .env
@@ -22,14 +22,14 @@ services:
 
   postgres:
     image: postgres:${POSTGRES_TAG:?The postgres image tag must be set}
-    container_name: scrapping-postgres
+    container_name: scraping-postgres
     restart: always
     ports:
       - "${POSTGRES_PORT:-15432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - scrappingnet
+      - scrapingnet
     profiles: [ "services" ]
     env_file:
       - .env
@@ -40,7 +40,7 @@ services:
         max-file: "5"
 
 networks:
-  scrappingnet:
+  scrapingnet:
 
 volumes:
   pgdata:

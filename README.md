@@ -1,4 +1,4 @@
-# Scrapping service
+# Scraping service
 A service which scrapes the data from the given resources and distributes it among configured integrations.
 
 ### Tools:

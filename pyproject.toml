@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "scrapping-service"
+name = "scraping-service"
 version = "0.1.0"
 description = "A service which scrapes the data from the given resources and distributes it among the configured integrations."
 authors = ["vladfedoriuk <vlad.fedoriuk2000@gmail.com>"]
@@ -12,6 +12,7 @@ psycopg2 = "^2.9.3"
 celery = {extras = ["redis"], version = "^5.2.6"}
 django-celery-results = "^2.3.1"
 django-jazzmin = "^2.5.0"
+httpx = "^0.22.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

@@ -36,7 +36,7 @@ class Resource(
     )
     url = URLField(
         verbose_name=_("resource url"),
-        help_text=_("This url will be used to start scrapping process."),
+        help_text=_("This url will be used to start scraping process."),
     )
     priority = models.SmallIntegerField(
         choices=PriorityChoices.choices,
@@ -77,7 +77,7 @@ class IntegrationConsumption(models.Model):
         related_query_name="data_consumption",
     )
     scrapped_data = models.ForeignKey(
-        "scrapper.ScrappedData",
+        "scraper.ScrappedData",
         on_delete=models.CASCADE,
         verbose_name=_("scrapped data"),
         related_name="integration_consumptions",

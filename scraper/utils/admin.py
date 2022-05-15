@@ -1,3 +1,8 @@
+from typing import cast
+
+from django.contrib.admin import ModelAdmin
+
+
 class ReadOnlyAdminMixin:
     """Disables all editing capabilities."""
 
@@ -5,10 +10,13 @@ class ReadOnlyAdminMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.readonly_fields = tuple(f.name for f in self.model._meta.get_fields())
+        self.readonly_fields = tuple(
+            field.name
+            for field in getattr(cast(ModelAdmin, self).model, "_meta").get_fields()
+        )
 
     def get_actions(self, request):
-        actions = super().get_actions(request)
+        actions = cast(ModelAdmin, super()).get_actions(request)
         actions.pop("delete_selected", None)
         return actions
 
