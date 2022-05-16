@@ -77,7 +77,7 @@ class IntegrationConsumption(models.Model):
         related_query_name="data_consumption",
     )
     scrapped_data = models.ForeignKey(
-        "scraper.ScrappedData",
+        "scraper.ScrapedData",
         on_delete=models.CASCADE,
         verbose_name=_("scrapped data"),
         related_name="integration_consumptions",
@@ -85,7 +85,7 @@ class IntegrationConsumption(models.Model):
     )
 
 
-class ScrappedData(TimeStampedModel):
+class ScrapedData(TimeStampedModel):
     resource = models.ForeignKey(
         Resource,
         on_delete=models.CASCADE,

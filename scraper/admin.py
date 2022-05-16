@@ -1,8 +1,6 @@
-from operator import attrgetter
-
 from django.contrib import admin
 
-from scraper.models import Topic, Resource, Integration, ScrappedData
+from scraper.models import Topic, Resource, Integration, ScrapedData
 from scraper.utils.admin import ReadOnlyAdminMixin
 
 
@@ -16,7 +14,7 @@ class ResourceInline(admin.StackedInline):
     extra = 1
 
 
-class ScrappedDataInline(ReadOnlyAdminMixin, admin.StackedInline):
+class ScrapedDataInline(ReadOnlyAdminMixin, admin.StackedInline):
     extra = 0
 
 
@@ -84,7 +82,7 @@ class IntegrationAdmin(admin.ModelAdmin):
     search_fields = ["title", "description", "topic__title", "topic__description"]
 
 
-class ScrappedDataAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
+class ScrapedDataAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "resource",
@@ -110,4 +108,4 @@ class ScrappedDataAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Resource, ResourceAdmin)
 admin.site.register(Integration, IntegrationAdmin)
-admin.site.register(ScrappedData, ScrappedDataAdmin)
+admin.site.register(ScrapedData, ScrapedDataAdmin)
