@@ -5,8 +5,8 @@ from celery.utils.log import get_task_logger
 
 from scraper.models import ScrapedData
 from scraper.utils.client.client import HttpClient
-from scraper.utils.client.hooks import add_consumer
-from scraper.utils.misc import get_scraped_data_by_pk
+from scraper.utils.tasks.hooks import add_consumer
+from scraper.utils.model import get_scraped_data_by_pk
 from scraper.utils.tasks import TaskWithRetryMixin, TransactionAwareTaskMixin
 
 logger = get_task_logger(__name__)

@@ -19,3 +19,5 @@ class TaskWithRetryMixin:
 class TransactionAwareTaskMixin:
     def apply_async_on_commit(self, *args, **kwargs):
         transaction.on_commit(lambda: cast(Task, self).apply_async(*args, **kwargs))
+
+
