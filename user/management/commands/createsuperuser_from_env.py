@@ -13,9 +13,6 @@ class Command(BaseCommand):
         try:
             user, created = User.objects.get_or_create(
                 username=DEFAULT_ADMIN["username"],
-                email=DEFAULT_ADMIN["email"],
-                is_staff=True,
-                is_superuser=True,
             )
             if not created:
                 self.stdout.write(
@@ -25,6 +22,11 @@ class Command(BaseCommand):
                 )
             else:
                 user.set_password(DEFAULT_ADMIN["password"])
+                user.email = DEFAULT_ADMIN["email"]
+                user.is_staff = True
+                user.is_superuser = True
+                user.is_active = True
+                user.save()
                 self.stdout.write(self.style.SUCCESS("Created a superuser."))
         except IntegrityError as ie:
             self.stderr.write(

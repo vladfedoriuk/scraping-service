@@ -8,6 +8,8 @@ from django_extensions.db.models import (
 )
 from django.utils.translation import gettext_lazy as _
 
+from scraper.scrapers.registry import scraper_choices
+
 
 class Topic(
     TimeStampedModel,
@@ -108,3 +110,34 @@ class ScrapedData(TimeStampedModel):
     class Meta:
         verbose_name = _("Scrapped Data")
         verbose_name_plural = verbose_name
+
+
+class ScraperConfiguration(TimeStampedModel):
+    resource = models.ForeignKey(
+        Resource,
+        on_delete=models.CASCADE,
+        verbose_name=_("resource"),
+        help_text=_("The related resource."),
+        related_name="scraper_configs",
+        related_query_name="scraper_config",
+    )
+    state = models.JSONField(
+        verbose_name=_("data"), help_text=_("The scrapped data."), default=dict
+    )
+    is_batched = models.BooleanField(
+        _("is batched"),
+        help_text=_("Whether data comes from scraper in batches."),
+        default=False,
+    )
+    batch_size = models.IntegerField(
+        _("batch size"),
+        help_text=_(
+            "A size of scraped data batches to send to the relevant integrations."
+        ),
+        default=1,
+    )
+    scraper_name = models.CharField(
+        _("A scraper name"),
+        help_text=_("A name of scraping algorithm to use."),
+        max_length=128,
+    )

@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from scraper.models import Topic, Resource, Integration, ScrapedData
+from scraper.models import (
+    Topic,
+    Resource,
+    Integration,
+    ScrapedData,
+    ScraperConfiguration,
+)
 from scraper.utils.admin import ReadOnlyAdminMixin
 
 
@@ -98,13 +104,26 @@ class ScrapedDataAdmin(ReadOnlyAdminMixin, admin.ModelAdmin):
     ordering = ("-modified", "created")
     search_fields = ["resource__title", "resource__description"]
 
-    def has_add_permission(self, request, obj=None):
-        return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+class ScraperConfigurationAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "scraper_name",
+        "resource",
+        "created",
+    )
+    list_filter = (
+        "created",
+        "modified",
+        ("resource", admin.RelatedOnlyFieldListFilter),
+    )
+    list_select_related = ("resource",)
+    date_hierarchy = "created"
+    ordering = ("-modified", "created")
+    search_fields = ["resource__title", "resource__description", "scraper_name"]
 
 
+admin.site.register(ScraperConfiguration, ScraperConfigurationAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Resource, ResourceAdmin)
 admin.site.register(Integration, IntegrationAdmin)
