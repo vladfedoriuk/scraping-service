@@ -44,7 +44,7 @@ def send_data(pk: int):
                 },
                 client_kwargs={
                     "event_hooks": {
-                        "response": add_consumer_hook,
+                        "response": [add_consumer_hook],
                     }
                 },
             )
