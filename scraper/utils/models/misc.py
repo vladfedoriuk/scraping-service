@@ -1,9 +1,7 @@
-from typing import Optional, TypeVar, Union, Type, cast
+from typing import TypeVar, Union, Type, cast, Optional
 
 from django.db import models
 from django.db.models import QuerySet, Manager
-
-from scraper.models import ScrapedData
 
 ModelType = TypeVar("ModelType", bound=models.Model)
 
@@ -26,15 +24,4 @@ def get_object_or_none(
     try:
         return queryset.get(*args, **kwargs)
     except (queryset.model.DoesNotExist, queryset.model.MultipleObjectsReturned):
-        return None
-
-
-def get_scraped_data_by_pk(pk: int) -> Optional[ScrapedData]:
-    try:
-        return (
-            ScrapedData.objects.all()
-            .prefetch_related("resource__topic__integrations")
-            .get(pk=pk)
-        )
-    except (ScrapedData.DoesNotExist, ScrapedData.MultipleObjectsReturned):
         return None

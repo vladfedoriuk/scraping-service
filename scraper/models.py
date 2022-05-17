@@ -49,6 +49,10 @@ class Resource(
         ),
     )
 
+    @property
+    def active(self) -> bool:
+        return self.status == Resource.ACTIVE_STATUS
+
 
 class Integration(
     ActivatorModel,
@@ -124,20 +128,10 @@ class ScraperConfiguration(TimeStampedModel):
     state = models.JSONField(
         verbose_name=_("data"), help_text=_("The scrapped data."), default=dict
     )
-    is_batched = models.BooleanField(
-        _("is batched"),
-        help_text=_("Whether data comes from scraper in batches."),
-        default=False,
-    )
-    batch_size = models.IntegerField(
-        _("batch size"),
-        help_text=_(
-            "A size of scraped data batches to send to the relevant integrations."
-        ),
-        default=1,
-    )
     scraper_name = models.CharField(
         _("A scraper name"),
         help_text=_("A name of scraping algorithm to use."),
         max_length=128,
+        unique=True,
+        choices=scraper_choices()
     )
