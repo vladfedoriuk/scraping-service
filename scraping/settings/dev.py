@@ -14,11 +14,18 @@ DATABASES = {
     }
 }
 
-CELERY_BROKER_URL = (
-    f'redis://{os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")}'
-    f':{os.environ.get("DJANGO_REDIS_PORT", 16379)}'
-)
-CELERY_RESULT_BACKEND = "django-db"
+REDIS_HOST = os.environ.get("DJANGO_REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.environ.get("DJANGO_REDIS_PORT", 16379)
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/",
+    }
+}
+
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"

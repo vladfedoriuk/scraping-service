@@ -133,5 +133,5 @@ class ScraperConfiguration(TimeStampedModel):
         help_text=_("A name of scraping algorithm to use."),
         max_length=128,
         unique=True,
-        choices=scraper_choices()
+        choices=scraper_choices(),
     )
