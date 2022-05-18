@@ -2,7 +2,6 @@ from collections import Sequence
 
 import httpx
 from celery.utils.log import get_task_logger
-from django.db import transaction
 
 from scraper.models import ScrapedData, Integration, IntegrationConsumption
 
@@ -17,9 +16,7 @@ def add_consumer(scraped_data: ScrapedData, integration: Integration):
                 f"Sent a {ScrapedData!r} instance with pk={scraped_data.pk}"
                 f" to integration with pk={integration.pk}"
             )
-            with transaction.atomic():
-                scraped_data.consumers.add(integration)
-                scraped_data.save()
+            scraped_data.consumers.add(integration)
 
     return response_hook
 

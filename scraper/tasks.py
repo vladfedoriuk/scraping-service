@@ -13,7 +13,7 @@ from scraper.utils.models.scraped_data import (
     get_scraped_data_by_pk,
     get_scraped_data_by_pk_list,
 )
-from scraper.utils.tasks.base import TaskWithRetryMixin, TransactionAwareTaskMixin
+from scraper.utils.tasks.mixins import TaskWithRetryMixin, TransactionAwareTaskMixin
 
 logger = get_task_logger(__name__)
 
