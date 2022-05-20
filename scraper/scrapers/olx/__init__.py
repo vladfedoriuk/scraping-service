@@ -15,5 +15,5 @@ class OLXScraper(Scraper, ChromeDriverProvider, ClientMixin, BeautifulSoupMixin)
         url = self.resource.url
         driver.get(url)
         driver.quit()
-        scraped_data = self.build_scraped_data({})
+        scraped_data = self.build_scraped_data({"a": "b"})
         return ScrapeResult(data=scraped_data, state={})

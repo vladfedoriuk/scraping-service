@@ -1,10 +1,6 @@
 from typing import cast
-
 from celery import Task
-from celery.utils.log import get_task_logger
 from django.db import transaction
-
-logger = get_task_logger(__name__)
 
 
 # Adopted from: https://testdriven.io/blog/retrying-failed-celery-tasks/

@@ -3,15 +3,13 @@ import logging
 import httpx
 
 
-def log_request(request: httpx.Request):
-    logger = logging.getLogger("django")
+def log_request(logger: logging.Logger, request: httpx.Request):
     logger.info(
         f"Request event hook: {request.method} {request.url} - Waiting for response"
     )
 
 
-def log_response(response: httpx.Response):
-    logger = logging.getLogger("django")
+def log_response(logger: logging.Logger, response: httpx.Response):
     request = response.request
     logger.info(
         f"Response event hook: {request.method} {request.url} - Status {response.status_code}"

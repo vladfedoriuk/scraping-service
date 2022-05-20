@@ -1,15 +1,14 @@
 import dataclasses
+import logging
 from collections.abc import Callable
 from functools import partialmethod
 
 import httpx
-import logging
 
 from httpx._types import HeaderTypes
 
 from scraper.utils.client.hooks import log_request, log_response, raise_on_4xx_5xx
-
-logger = logging.getLogger("django")
+from scraper.utils.decorators.misc import with_logger
 
 
 @dataclasses.dataclass
@@ -17,14 +16,16 @@ class HttpClient:
     request_hooks: list[Callable] = dataclasses.field(default_factory=list)
     response_hooks: list[Callable] = dataclasses.field(default_factory=list)
     headers: HeaderTypes = dataclasses.field(default_factory=dict)
+    logger: logging.Logger = dataclasses.field(default_factory=lambda: logging.getLogger("django"))
 
     def __post_init__(self):
+        self.__with_logger = with_logger(self.logger)
         self.__hooks = self.__collect_event_hooks()
 
     def __collect_event_hooks(self):
         return {
-            "request": [log_request] + self.request_hooks,
-            "response": [log_response] + self.response_hooks + [raise_on_4xx_5xx],
+            "request": [ self.__with_logger(log_request)] + self.request_hooks,
+            "response": [ self.__with_logger(log_response)] + self.response_hooks + [raise_on_4xx_5xx],
         }
 
     def __prepare_client_kwargs(self, client_kwargs=None):
@@ -48,9 +49,9 @@ class HttpClient:
             try:
                 return client.request(method, url, **request_kwargs)
             except httpx.RequestError as exc:
-                logger.error(f"An error occurred while requesting {exc.request.url!r}.")
+                self.logger.error(f"An error occurred while requesting {exc.request.url!r}.")
             except httpx.HTTPStatusError as exc:
-                logger.error(
+                self.logger.error(
                     f"Error response {exc.response.status_code} while requesting {exc.request.url!r}."
                 )
             return None

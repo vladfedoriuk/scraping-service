@@ -1,16 +1,14 @@
+import logging
 from collections.abc import Sequence
 
 import httpx
-from celery.utils.log import get_task_logger
 
 from scraper.models import ScrapedData, Integration, IntegrationConsumption
 
 
 def add_consumer(scraped_data: ScrapedData, integration: Integration):
 
-    logger = get_task_logger(__name__)
-
-    def response_hook(response: httpx.Response):
+    def response_hook(logger: logging.Logger, response: httpx.Response):
         if response.is_success:
             logger.info(
                 f"Sent a {ScrapedData!r} instance with pk={scraped_data.pk}"
@@ -23,11 +21,9 @@ def add_consumer(scraped_data: ScrapedData, integration: Integration):
 
 def add_consumers(scraped_data_batch: Sequence[ScrapedData], integration: Integration):
 
-    logger = get_task_logger(__name__)
-
     scraped_data_pk_list = [data.pk for data in scraped_data_batch]
 
-    def response_hook(response: httpx.Response):
+    def response_hook(logger: logging.Logger, response: httpx.Response):
         if response.is_success:
             logger.info(
                 f"Sent a batch of {ScrapedData!r} instances "

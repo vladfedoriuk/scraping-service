@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from scraper.models import ScrapedData, Resource
 from scraper.scrapers import get_from_registry, Scraper
 from scraper.utils.client.client import HttpClient
+from scraper.utils.decorators.misc import with_logger
 from scraper.utils.models.resource import get_resource_by_pk
 from scraper.utils.tasks.hooks import add_consumer, add_consumers
 from scraper.utils.models.scraped_data import (
@@ -58,7 +59,7 @@ def send_data(scraped_data_pk: int):
             },
             client_kwargs={
                 "event_hooks": {
-                    "response": [add_consumer_hook(integration)],
+                    "response": [with_logger(logger)(add_consumer_hook(integration))],
                 }
             },
         )
@@ -86,7 +87,7 @@ def send_batched_data(scraped_data_pk_list: list[int]):
             },
             client_kwargs={
                 "event_hooks": {
-                    "response": [add_consumer_hook(integration)],
+                    "response": [with_logger(logger)(add_consumer_hook(integration))],
                 }
             },
         )
