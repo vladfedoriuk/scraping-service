@@ -4,11 +4,11 @@ from django_extensions.db.fields import CreationDateTimeField
 from django_extensions.db.models import (
     TitleSlugDescriptionModel,
     TimeStampedModel,
-    ActivatorModel,
 )
 from django.utils.translation import gettext_lazy as _
 
 from scraper.scrapers.registry import scraper_choices
+from scraper.utils.models.base import ExtendedActivatorModel
 
 
 class Topic(
@@ -19,8 +19,8 @@ class Topic(
 
 
 class Resource(
-    ActivatorModel,
     TimeStampedModel,
+    ExtendedActivatorModel,
     TitleSlugDescriptionModel,
 ):
     class PriorityChoices(models.IntegerChoices):
@@ -49,14 +49,10 @@ class Resource(
         ),
     )
 
-    @property
-    def active(self) -> bool:
-        return self.status == Resource.ACTIVE_STATUS
-
 
 class Integration(
-    ActivatorModel,
     TimeStampedModel,
+    ExtendedActivatorModel,
     TitleSlugDescriptionModel,
 ):
     topic = models.ForeignKey(
@@ -116,7 +112,10 @@ class ScrapedData(TimeStampedModel):
         verbose_name_plural = verbose_name
 
 
-class ScraperConfiguration(TimeStampedModel):
+class ScraperConfiguration(
+    TimeStampedModel,
+    ExtendedActivatorModel,
+):
     resource = models.ForeignKey(
         Resource,
         on_delete=models.CASCADE,
@@ -126,7 +125,10 @@ class ScraperConfiguration(TimeStampedModel):
         related_query_name="scraper_config",
     )
     state = models.JSONField(
-        verbose_name=_("data"), help_text=_("The scrapped data."), default=dict
+        verbose_name=_("state"),
+        help_text=_("The scrapped data."),
+        default=dict,
+        blank=True,
     )
     scraper_name = models.CharField(
         _("A scraper name"),

@@ -1,5 +1,5 @@
 import dataclasses
-from collections import Callable
+from collections.abc import Callable
 from functools import partialmethod
 
 import httpx

@@ -1,4 +1,4 @@
-from collections import Sequence
+from collections.abc import Sequence
 
 import httpx
 from celery.utils.log import get_task_logger

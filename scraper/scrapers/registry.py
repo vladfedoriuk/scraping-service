@@ -26,6 +26,6 @@ def get_from_registry(scraper_name: str) -> Type[ScraperType]:
 
 def scraper_choices() -> tuple[tuple[str, str]]:
     return tuple(
-        (scraper_name, str(scraper_cls))
+        (scraper_name, f"{scraper_cls.app_name}.{scraper_cls.__qualname__}")
         for scraper_name, scraper_cls in _registry.items()
     )

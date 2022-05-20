@@ -1,4 +1,4 @@
-.PHONY: services
+.PHONY: services down selery-worker dev
 
 # docker
 
@@ -13,3 +13,6 @@ down: ### bring down all the services
 
 celery-worker: ### spin up a celery worker process
 	celery -A scraping worker -l info
+
+dev: services ### spin up development server
+	python manage.py runserver

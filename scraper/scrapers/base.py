@@ -2,6 +2,7 @@ import dataclasses
 from abc import ABC, abstractmethod
 from typing import Optional, Union, Sequence
 
+from django.db import transaction
 from django.utils.functional import classproperty
 
 from typing import TYPE_CHECKING
@@ -57,6 +58,22 @@ class Scraper(ABC):
 
         self.__configuration: Optional[ScraperConfiguration] = None
 
+    def build_scraped_data(
+        self, data: Union[dict, Sequence[dict]]
+    ) -> Union["ScrapedData", Sequence["ScrapedData"]]:
+        from scraper.models import ScrapedData
+
+        if isinstance(data, Sequence):
+            ScrapedData.objects.bulk_create(
+                scraped_data := [
+                    ScrapedData(resource=self.resource, data=data_point)
+                    for data_point in data
+                ]
+            )
+        else:
+            scraped_data = ScrapedData.objects.create(resource=self.resource, data=data)
+        return scraped_data
+
     @property
     def state(self) -> Optional[dict]:
         self.__reload_configuration_if_none()
@@ -65,10 +82,11 @@ class Scraper(ABC):
 
     @state.setter
     def state(self, state_data):
-        self.__reload_configuration_if_none()
-        self.__check_configuration_has_been_loaded()
-        self.__configuration.state = state_data
-        self.__configuration.save(update_fields=("state",))
+        with transaction.atomic():
+            self.__reload_configuration_if_none()
+            self.__check_configuration_has_been_loaded()
+            self.__configuration.state = state_data
+            self.__configuration.save(update_fields=("state",))
 
     @property
     def resource(self) -> Optional["Resource"]:
@@ -76,14 +94,23 @@ class Scraper(ABC):
         self.__check_configuration_has_been_loaded()
         return self.__configuration.resource
 
+    @property
+    def is_active(self) -> bool:
+        return self.resource.is_active and self.__configuration.is_active
+
     @abstractmethod
     def scrape(self) -> ScrapeResult:
         ...
 
     def step(self) -> Union["ScrapedData", Sequence["ScrapedData"]]:
         self.__reload_configuration()
-        if not self.resource.active:
+        if not self.resource.is_active:
             raise RuntimeError(f"Cannot start scraping inactive {self.resource=}")
+        if not self.is_active:
+            raise RuntimeError(
+                f"An attempt to start an inactive "
+                f"scraping algorithm with {self.scraper_name=}"
+            )
         scrape_result = self.scrape()
         self.state = scrape_result.state
         return scrape_result.data
