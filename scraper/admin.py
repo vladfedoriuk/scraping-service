@@ -144,6 +144,7 @@ class ScraperConfigurationAdmin(admin.ModelAdmin):
     @admin.action(description=_("Start the related scraping algorithms"))
     def start_scraping(self, request, queryset):
         from scraper.tasks import scraping_dispatcher
+
         queryset.update(status=ScraperConfiguration.ACTIVE_STATUS)
         resources_pk = queryset.values_list("resource__pk", flat=True)
         for resource_pk in resources_pk:

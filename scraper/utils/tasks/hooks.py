@@ -7,7 +7,6 @@ from scraper.models import ScrapedData, Integration, IntegrationConsumption
 
 
 def add_consumer(scraped_data: ScrapedData, integration: Integration):
-
     def response_hook(logger: logging.Logger, response: httpx.Response):
         if response.is_success:
             logger.info(

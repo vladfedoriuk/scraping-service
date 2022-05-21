@@ -3,8 +3,8 @@ from collections.abc import Callable
 from logging import Logger
 from typing import Concatenate, ParamSpec, TypeVar
 
-P = ParamSpec('P')
-R = TypeVar('R')
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
 def with_logger(logger: Logger):

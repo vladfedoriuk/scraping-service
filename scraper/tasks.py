@@ -78,7 +78,7 @@ def send_batched_data(scraped_data_pk_list: list[int]):
 
     client = HttpClient()
     add_consumer_hook = partial(add_consumers, scraped_data_batch)
-    integrations = scraped_data_batch[0].resource.topic.integrations
+    integrations = scraped_data_batch[0].resource.topic.integrations.all()
     for integration in integrations:
         client.post(
             url=integration.hook_url,
@@ -95,7 +95,7 @@ def send_batched_data(scraped_data_pk_list: list[int]):
 
 @shared_task(base=ScrapingDispatcherTask)
 def scraping_dispatcher(resource_pk: int):
-    resource = get_resource_by_pk(pk=resource_pk)
+    resource: Resource = get_resource_by_pk(pk=resource_pk)
     if resource is None:
         logger.error(f"Cannot retrieve an instance of {Resource!r} by {resource_pk=!r}")
         return

@@ -1,14 +1,18 @@
 from typing import TypeVar, Union, Type, cast, Optional
 
-from django.db import models
-from django.db.models import QuerySet, Manager
+from django.db.models import QuerySet, Manager, Model
 
-ModelType = TypeVar("ModelType", bound=models.Model)
+ModelType = TypeVar("ModelType", bound=Model)
+ManagerType = TypeVar("ManagerType", bound=Manager)
+
+
+def get_default_manager(model: Type[ModelType]) -> ManagerType:
+    return getattr(model, "_default_manager")
 
 
 def get_queryset(resource: Union[Type[ModelType], QuerySet, Manager]) -> QuerySet:
     if hasattr(resource, "_default_manager"):
-        queryset: QuerySet = getattr(resource, "_default_manager").all()
+        queryset: QuerySet = get_default_manager(resource).all()
         return queryset
     if hasattr(resource, "get"):
         return cast(QuerySet, resource)
