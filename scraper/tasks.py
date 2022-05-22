@@ -4,6 +4,7 @@ from functools import partial
 from celery import shared_task, Task
 from celery.utils.log import get_task_logger
 
+from scraper.api.serializers import ScrapedDataSerializer
 from scraper.models import ScrapedData, Resource
 from scraper.scrapers import get_from_registry, Scraper
 from scraper.utils.client.client import HttpClient
@@ -55,7 +56,7 @@ def send_data(scraped_data_pk: int):
         client.post(
             url=integration.hook_url,
             request_kwargs={
-                "json": scraped_data.data,
+                "json": ScrapedDataSerializer(instance=scraped_data).data,
             },
             client_kwargs={
                 "event_hooks": {
@@ -78,12 +79,12 @@ def send_batched_data(scraped_data_pk_list: list[int]):
 
     client = HttpClient()
     add_consumer_hook = partial(add_consumers, scraped_data_batch)
-    integrations = scraped_data_batch[0].resource.topic.integrations.all()
+    integrations = next(iter(scraped_data_batch)).resource.topic.integrations.all()
     for integration in integrations:
         client.post(
             url=integration.hook_url,
             request_kwargs={
-                "json": [scraped_data.data for scraped_data in scraped_data_batch],
+                "json": ScrapedDataSerializer(scraped_data_batch, many=True).data,
             },
             client_kwargs={
                 "event_hooks": {
@@ -107,9 +108,11 @@ def scraping_dispatcher(resource_pk: int):
         )
         return
 
-    scraper_names = [
-        config.scraper_name for config in getattr(resource, "scraper_configs").all()
-    ]
+    scraper_names = (
+        getattr(resource, "scraper_configs")
+        .all()
+        .values_list("scraper_name", flat=True)
+    )
     for scraper_name in scraper_names:
         scrape_data.apply_async(args=(scraper_name,))
 

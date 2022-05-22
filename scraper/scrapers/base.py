@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union, Sequence
 
 from django.db import transaction
-from django.utils.functional import classproperty
+from django.utils.functional import classproperty, cached_property
 
 from typing import TYPE_CHECKING
 
@@ -13,13 +13,17 @@ if TYPE_CHECKING:
 
 __all__ = ("Scraper",)
 
-from scraper.utils.models.misc import get_object_or_none
+from scraper.utils.models.misc import get_object_or_none, get_default_manager
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ScrapeResult:
     data: Union["ScrapedData", Sequence["ScrapedData"]]
     state: dict
+
+    @cached_property
+    def is_empty(self) -> bool:
+        return self.data.is_empty
 
 
 class Scraper(ABC):
@@ -64,14 +68,14 @@ class Scraper(ABC):
         from scraper.models import ScrapedData
 
         if isinstance(data, Sequence):
-            ScrapedData.objects.bulk_create(
+            get_default_manager(ScrapedData).bulk_create(
                 scraped_data := [
                     ScrapedData(resource=self.resource, data=data_point)
                     for data_point in data
                 ]
             )
         else:
-            scraped_data = ScrapedData.objects.create(resource=self.resource, data=data)
+            scraped_data = get_default_manager(ScrapedData).create(resource=self.resource, data=data)
         return scraped_data
 
     @property
@@ -98,6 +102,15 @@ class Scraper(ABC):
     def is_active(self) -> bool:
         return self.resource.is_active and self.__configuration.is_active
 
+    def deactivate(self):
+        from scraper.models import ScraperConfiguration
+
+        with transaction.atomic():
+            self.__reload_configuration_if_none()
+            self.__check_configuration_has_been_loaded()
+            self.__configuration.status = ScraperConfiguration.INACTIVE_STATUS
+            self.__configuration.save(update_fields=("status", ))
+
     @abstractmethod
     def scrape(self) -> ScrapeResult:
         ...
@@ -113,4 +126,6 @@ class Scraper(ABC):
             )
         scrape_result = self.scrape()
         self.state = scrape_result.state
+        if scrape_result.is_empty:
+            self.deactivate()
         return scrape_result.data

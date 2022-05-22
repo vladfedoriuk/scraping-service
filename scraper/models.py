@@ -107,6 +107,10 @@ class ScrapedData(TimeStampedModel):
         verbose_name=_("data"), help_text=_("The scrapped data."), default=dict
     )
 
+    @property
+    def is_empty(self) -> bool:
+        return not self.data
+
     class Meta:
         verbose_name = _("Scrapped Data")
         verbose_name_plural = verbose_name
