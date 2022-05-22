@@ -40,14 +40,14 @@ services:
         max-file: "5"
 
   selenium-hub:
-    image: selenium/hub:4.1.4
+    image: selenium/hub:${SELENIUM_HUB_TAG:?The selenium hub image tag must be set}
     container_name: selenium-hub
     shm_size: 2gb
     restart: always
     ports:
-      - "4442:4442"
-      - "4443:4443"
-      - "4444:4444"
+      - "${SELENIUM_EVENT_BUS_PUBLISH_PORT:-4442}:4442"
+      - "${SELENIUM_EVENT_BUS_SUBSCRIBE_PORT:-4443}:4443"
+      - "${SELENIUM_HUB_PORT:-4444}:4444"
     networks:
       - scrapingnet
     profiles: [ "services" ]
@@ -58,7 +58,7 @@ services:
         max-file: "5"
 
   chrome:
-    image: selenium/node-chrome:4.1.4-20220427
+    image: selenium/node-chrome:${CHROME_TAG:?The edge image tag must be set}
     container_name: chrome
     shm_size: 2gb
     restart: always
@@ -80,7 +80,7 @@ services:
         max-file: "5"
 
   edge:
-    image: selenium/node-edge:4.1.4-20220427
+    image: selenium/node-edge:${EDGE_TAG:?The edge image tag must be set}
     container_name: edge
     shm_size: 2gb
     restart: always
@@ -102,7 +102,7 @@ services:
         max-file: "5"
 
   firefox:
-    image: selenium/node-firefox:4.1.4
+    image: selenium/node-firefox:${FIREFOX_TAG:?The firefox image tag must be set}
     container_name: firefox
     shm_size: 2gb
     restart: always
