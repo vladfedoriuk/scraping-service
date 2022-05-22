@@ -13,6 +13,6 @@ JSONType = Union[
 
 class ScrapedData(BaseModel):
     resource: int
-    data:  JSONType
+    data: JSONType
     created: datetime.datetime
     modified: datetime.datetime

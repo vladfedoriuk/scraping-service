@@ -11,7 +11,7 @@ class Environment(Enum):
 
 class Settings(BaseSettings):
     telegram_bot_token: str
-    chat_id: str
+    channel_name: str
     environment: str = Environment.DEV
     testing: bool = False
 
