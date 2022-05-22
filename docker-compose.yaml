@@ -58,7 +58,7 @@ services:
         max-file: "5"
 
   chrome:
-    image: selenium/node-chrome:${CHROME_TAG:?The edge image tag must be set}
+    image: selenium/node-chrome:${CHROME_TAG:?The chrome image tag must be set}
     container_name: chrome
     shm_size: 2gb
     restart: always
@@ -136,7 +136,7 @@ services:
     volumes:
       - .:/code
     ports:
-      - 5555:5555
+      - "${FLOWER_PORT:-5555}:5555"
     networks:
       - scrapingnet
     profiles: [ "observability" ]
@@ -151,10 +151,32 @@ services:
         max-size: "1024k"
         max-file: "5"
 
+  telegram:
+    build:
+      context: examples/integrations/telegram
+      target: dev
+    container_name: telegram
+    restart: always
+    command: uvicorn main:app --reload --workers 1 --host 0.0.0.0 --port 8001
+    volumes:
+      - ./examples/integrations/telegram:/app
+    ports:
+      - "${TELEGRAM_INTEGRATION_PORT:-8001}:8001"
+    profiles: [ "examples-integrations" ]
+    environment:
+      - TESTING=0
+      - ENVIRONMENT=development
+    env_file:
+      - ./examples/integrations/telegram/.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1024k"
+        max-file: "5"
+
 networks:
   scrapingnet:
 
 volumes:
   pgdata:
   redisdata:
-

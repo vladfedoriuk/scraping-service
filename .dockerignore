@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+docker-compose.yaml
+Dockerfile
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Tests
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache
+.hypothesis
+
+# MyPy
+.mypy_cache
+
+# Examples
+examples
+
+# Environment
+.env
+.env.template

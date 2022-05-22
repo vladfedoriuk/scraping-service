@@ -75,7 +75,9 @@ class Scraper(ABC):
                 ]
             )
         else:
-            scraped_data = get_default_manager(ScrapedData).create(resource=self.resource, data=data)
+            scraped_data = get_default_manager(ScrapedData).create(
+                resource=self.resource, data=data
+            )
         return scraped_data
 
     @property
@@ -109,7 +111,7 @@ class Scraper(ABC):
             self.__reload_configuration_if_none()
             self.__check_configuration_has_been_loaded()
             self.__configuration.status = ScraperConfiguration.INACTIVE_STATUS
-            self.__configuration.save(update_fields=("status", ))
+            self.__configuration.save(update_fields=("status",))
 
     @abstractmethod
     def scrape(self) -> ScrapeResult:

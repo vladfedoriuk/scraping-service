@@ -48,4 +48,4 @@ FROM builder as dev
 
 ENV DEBUG 1
 ENV DJANGO_SETTINGS_MODULE 'scraping.settings.dev'
-COPY . /code
+COPY --chown=web:web . /code
