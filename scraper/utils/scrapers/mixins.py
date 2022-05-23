@@ -23,7 +23,6 @@ class BeautifulSoupMixin:
 
 
 class DriverProvider(Protocol[DriverType, DriverOptionsType]):
-    driver: DriverType
 
     def extend_options(self, options: DriverOptionsType):
         pass
@@ -46,8 +45,7 @@ class ChromeDriverProvider(DriverProvider[webdriver.Chrome, webdriver.ChromeOpti
     def get_remote_driver(self):
         from django.conf import settings
 
-        self.driver = webdriver.Remote(
+        return webdriver.Remote(
             command_executor=settings.SELENIUM_HUB_URL,
             options=self._get_remote_driver_options(),
         )
-        return self.driver

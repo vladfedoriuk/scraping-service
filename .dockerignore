@@ -38,3 +38,6 @@ examples
 # Environment
 .env
 .env.template
+
+# Jupyter notebook:
+.ipynb_checkpoints
