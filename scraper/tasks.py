@@ -6,7 +6,7 @@ from celery.utils.log import get_task_logger
 
 from scraper.api.serializers import ScrapedDataSerializer
 from scraper.models import ScrapedData, Resource
-from scraper.scrapers import get_from_registry, Scraper
+from scraper.scrapers import get_from_registry, Scraper, ScrapeResult
 from scraper.utils.client.client import HttpClient
 from scraper.utils.decorators.misc import with_logger
 from scraper.utils.models.resource import get_resource_by_pk
@@ -128,17 +128,20 @@ def scrape_data(scraper_name: str):
         )
         return
 
-    scraped_data = scraper.step()
+    scraped_result: ScrapeResult = scraper.step()
 
-    if not scraped_data.data:
+    if scraped_result.is_empty:
         logger.error(
             f"The {Scraper!r} with {scraper_name=!r} returned empty data. "
             f"Halting scraping process."
         )
         return
 
+    scraped_data = scraped_result.data
     if isinstance(scraped_data, Iterable):
-        send_batched_data.apply_async(args=([data.pk for data in scraped_data]))
+        send_batched_data.apply_async(args=([data.pk for data in scraped_data],))
     else:
         send_data.apply_async(args=(scraped_data.pk,))
-    scrape_data.apply_async(args=(scraper_name,), countdown=10)
+    scrape_data.apply_async(
+        args=(scraper_name,), countdown=scraper.scrape_data_countdown.seconds
+    )

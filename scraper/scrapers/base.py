@@ -1,5 +1,6 @@
 import dataclasses
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import Optional, Union, Sequence
 
 from django.db import transaction
@@ -11,7 +12,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from scraper.models import ScrapedData, ScraperConfiguration, Resource
 
-__all__ = ("Scraper",)
+__all__ = ("Scraper", "ScrapeResult")
 
 from scraper.utils.models.misc import get_object_or_none, get_default_manager
 
@@ -23,10 +24,11 @@ class ScrapeResult:
 
     @cached_property
     def is_empty(self) -> bool:
-        return self.data.is_empty
+        return not self.data if isinstance(self.data, Sequence) else self.data.is_empty
 
 
 class Scraper(ABC):
+    scrape_data_countdown: timedelta = timedelta(minutes=10)
     app_name = "scraper"
 
     @classproperty
@@ -67,17 +69,16 @@ class Scraper(ABC):
     ) -> Union["ScrapedData", Sequence["ScrapedData"]]:
         from scraper.models import ScrapedData
 
+        manager = get_default_manager(ScrapedData)
         if isinstance(data, Sequence):
-            get_default_manager(ScrapedData).bulk_create(
+            manager.bulk_create(
                 scraped_data := [
                     ScrapedData(resource=self.resource, data=data_point)
                     for data_point in data
                 ]
             )
         else:
-            scraped_data = get_default_manager(ScrapedData).create(
-                resource=self.resource, data=data
-            )
+            scraped_data = manager.create(resource=self.resource, data=data)
         return scraped_data
 
     @property
@@ -117,7 +118,7 @@ class Scraper(ABC):
     def scrape(self) -> ScrapeResult:
         ...
 
-    def step(self) -> Union["ScrapedData", Sequence["ScrapedData"]]:
+    def step(self) -> ScrapeResult:
         self.__reload_configuration()
         if not self.resource.is_active:
             raise RuntimeError(f"Cannot start scraping inactive {self.resource=}")
@@ -130,4 +131,4 @@ class Scraper(ABC):
         self.state = scrape_result.state
         if scrape_result.is_empty:
             self.deactivate()
-        return scrape_result.data
+        return scrape_result

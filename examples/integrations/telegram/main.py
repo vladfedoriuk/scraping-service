@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Iterable
 
 import telegram
 from fastapi import FastAPI, Depends
@@ -27,7 +27,11 @@ async def accept_scraped_data(
     bot: telegram.Bot = Depends(get_bot),
     channel_id: str = Depends(get_channel_id),
 ):
-    bot.send_message(
-        chat_id=channel_id, text=scraped_data.data, parse_mode=telegram.ParseMode.HTML
+    scraped_data = (
+        scraped_data if isinstance(scraped_data, Iterable) else (scraped_data,)
     )
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    for data in scraped_data:
+        bot.send_message(
+            chat_id=channel_id, text=data, parse_mode=telegram.ParseMode.HTML
+        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)

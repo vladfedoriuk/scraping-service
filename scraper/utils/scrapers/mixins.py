@@ -23,7 +23,6 @@ class BeautifulSoupMixin:
 
 
 class DriverProvider(Protocol[DriverType, DriverOptionsType]):
-
     def extend_options(self, options: DriverOptionsType):
         pass
 
