@@ -78,7 +78,7 @@ class IntegrationConsumption(models.Model):
         related_name="data_consumptions",
         related_query_name="data_consumption",
     )
-    scrapped_data = models.ForeignKey(
+    scraped_data = models.ForeignKey(
         "scraper.ScrapedData",
         on_delete=models.CASCADE,
         verbose_name=_("scrapped data"),
@@ -93,12 +93,12 @@ class ScrapedData(TimeStampedModel):
         on_delete=models.CASCADE,
         verbose_name=_("resource"),
         help_text=_("The related resource."),
-        related_name="scrapped_data",
+        related_name="scraped_data",
     )
     consumers = models.ManyToManyField(
         Integration,
         through=IntegrationConsumption,
-        through_fields=("scrapped_data", "integration"),
+        through_fields=("scraped_data", "integration"),
         verbose_name=_("consumers"),
         help_text=_("The integrations which have already consumed this data."),
         related_name="consumed_data",

@@ -32,6 +32,6 @@ async def accept_scraped_data(
     )
     for data in scraped_data:
         bot.send_message(
-            chat_id=channel_id, text=data, parse_mode=telegram.ParseMode.HTML
+            chat_id=channel_id, text=data.data, parse_mode=telegram.ParseMode.HTML
         )
         return Response(status_code=status.HTTP_204_NO_CONTENT)

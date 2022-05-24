@@ -4,6 +4,7 @@ from collections.abc import Sequence
 import httpx
 
 from scraper.models import ScrapedData, Integration, IntegrationConsumption
+from scraper.utils.models.misc import get_default_manager
 
 
 def add_consumer(scraped_data: ScrapedData, integration: Integration):
@@ -29,7 +30,7 @@ def add_consumers(scraped_data_batch: Sequence[ScrapedData], integration: Integr
                 f"with pk={scraped_data_pk_list} "
                 f"to integration with pk={integration.pk}"
             )
-            IntegrationConsumption.objects.create_batch(
+            get_default_manager(IntegrationConsumption).bulk_create(
                 [
                     IntegrationConsumption(integration=integration, scraped_data=data)
                     for data in scraped_data_batch
