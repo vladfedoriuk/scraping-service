@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import selenium.common
 
 from scraper.scrapers import Scraper
@@ -10,13 +12,15 @@ __all__ = ("OLXScraper",)
 
 
 class OLXScraper(Scraper, ChromeDriverProvider):
+    scrape_data_countdown: timedelta = timedelta(minutes=1)
+
     def get_offer_list_url(self) -> str:
         return self.state.get("url") or self.resource.url
 
     def scrape(self) -> ScrapeResult:
         with quiting_driver(self.get_remote_driver()) as driver:
             url = self.get_offer_list_url()
-            driver.implicitly_wait(5)
+            driver.implicitly_wait(1)
             driver.get(url)
             next_url = driver.find_element(
                 by=By.XPATH, value="//a[@data-cy='pagination-forward']"

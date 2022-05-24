@@ -1,7 +1,10 @@
-from typing import List, Union, Iterable
+import time
+from collections.abc import Iterable
+from functools import partial
+from typing import List, Union
 
 import telegram
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, BackgroundTasks
 from starlette import status
 from starlette.responses import Response
 
@@ -21,17 +24,29 @@ def get_channel_id(settings: Settings = Depends(get_settings)):
     return f"@{channel_name}"
 
 
-@app.post("/telegram-integration-web-hook/")
-async def accept_scraped_data(
+def send_data_to_telegram(
+    bot: telegram.Bot,
+    channel_id: str,
     scraped_data: Union[List[ScrapedData], ScrapedData],
-    bot: telegram.Bot = Depends(get_bot),
-    channel_id: str = Depends(get_channel_id),
 ):
     scraped_data = (
         scraped_data if isinstance(scraped_data, Iterable) else (scraped_data,)
     )
     for data in scraped_data:
+        time.sleep(5)
         bot.send_message(
             chat_id=channel_id, text=data.data, parse_mode=telegram.ParseMode.HTML
         )
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.post("/telegram-integration-web-hook/")
+async def accept_scraped_data(
+    scraped_data: Union[List[ScrapedData], ScrapedData],
+    background_tasks: BackgroundTasks,
+    bot: telegram.Bot = Depends(get_bot),
+    channel_id: str = Depends(get_channel_id),
+):
+    background_tasks.add_task(
+        partial(send_data_to_telegram, bot, channel_id), scraped_data
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
