@@ -38,14 +38,14 @@ def send_data(scraped_data_pk: int):
     scraped_data = get_scraped_data_by_pk(pk=scraped_data_pk)
     if scraped_data is None:
         logger.error(
-            f"Cannot retrieve an instance of {ScrapedData!r} by {scraped_data_pk=!r}"
+            f"Cannot retrieve an instance of {ScrapedData.__qualname__!r} by {scraped_data_pk=!r}"
             f"Aborting sending data."
         )
         return
 
     if not scraped_data.data:
         logger.error(
-            f"The provided {ScrapedData!r} with {scraped_data_pk=} has no data to send"
+            f"The provided {ScrapedData.__qualname__!r} with {scraped_data_pk=} has no data to send"
             f"Aborting sending data."
         )
         return
@@ -98,12 +98,14 @@ def send_batched_data(scraped_data_pk_list: list[int]):
 def scraping_dispatcher(resource_pk: int):
     resource: Resource = get_resource_by_pk(pk=resource_pk)
     if resource is None:
-        logger.error(f"Cannot retrieve an instance of {Resource!r} by {resource_pk=!r}")
+        logger.error(
+            f"Cannot retrieve an instance of {Resource.__qualname__!r} by {resource_pk=!r}"
+        )
         return
 
     if not resource.is_active:
         logger.error(
-            f"The {Resource!r} with {resource_pk=!r} is inactive. "
+            f"The {Resource.__qualname__!r} with {resource_pk=!r} is inactive. "
             f"Aborted scraping dispatching."
         )
         return
@@ -123,7 +125,7 @@ def scrape_data(scraper_name: str):
     scraper: Scraper = scraper_cls()
     if not scraper.is_active:
         logger.error(
-            f"The {Scraper!r} with {scraper_name=!r} is inactive. "
+            f"The {Scraper.__qualname__!r} with {scraper_name=!r} is inactive. "
             f"Aborted scraping process."
         )
         return
@@ -132,7 +134,7 @@ def scrape_data(scraper_name: str):
 
     if scraped_result.is_empty:
         logger.error(
-            f"The {Scraper!r} with {scraper_name=!r} returned empty data. "
+            f"The {Scraper.__qualname__!r} with {scraper_name=!r} returned empty data. "
             f"Halting scraping process."
         )
         return

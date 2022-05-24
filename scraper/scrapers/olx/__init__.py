@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import selenium.common
+from celery.utils.log import get_task_logger
 
 from scraper.scrapers import Scraper
 from scraper.scrapers.base import ScrapeResult
@@ -9,6 +10,8 @@ from scraper.utils.scrapers.mixins import ChromeDriverProvider
 from selenium.webdriver.common.by import By
 
 __all__ = ("OLXScraper",)
+
+logger = get_task_logger(__name__)
 
 
 class OLXScraper(Scraper, ChromeDriverProvider):
@@ -28,6 +31,9 @@ class OLXScraper(Scraper, ChromeDriverProvider):
             offer_divs = driver.find_elements(
                 by=By.XPATH, value="//div[@data-cy='l-card']"
             )
+
+            logger.info("OLXScraper: Retrieved offer divs")
+
             data = []
             for offer_div in offer_divs:
                 offer_header = offer_div.find_element(by=By.TAG_NAME, value="h6").text
@@ -44,6 +50,8 @@ class OLXScraper(Scraper, ChromeDriverProvider):
                         "location": offer_location,
                     }
                 )
+            logger.info("OLXScraper: Parsed header, link, and location.")
+
             for offer_data in data:
                 driver.get(offer_data["link"])
                 offer_price = driver.find_element(by=By.XPATH, value="//h3").text
@@ -56,6 +64,8 @@ class OLXScraper(Scraper, ChromeDriverProvider):
                     offer_description = ""
                 offer_data["price"] = offer_price
                 offer_data["description"] = offer_description
+
+            logger.info("OLXScraper: Parsed price and description")
 
             scraped_data = self.build_scraped_data(data)
             return ScrapeResult(data=scraped_data, state={"url": next_url})
