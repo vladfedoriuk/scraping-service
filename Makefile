@@ -17,4 +17,3 @@ dev: services observability  ### spin up development server and the worker proce
 down:  ### bring down all the services.
 	docker compose down --remove-orphans
 
-

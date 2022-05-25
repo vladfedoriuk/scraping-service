@@ -159,9 +159,8 @@ services:
     <<: *backend
     container_name: celery-worker-dev
     restart: always
-    command: celery -A scraping flower
-    ports:
-      - "${SCRAPING_SERVICE_DEV_PORT:-8000}:8000"
+    command: celery -A scraping worker -l info
+    ports: []
 
   flower:
     <<: *backend
