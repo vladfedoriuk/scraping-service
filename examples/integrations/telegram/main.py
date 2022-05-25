@@ -32,9 +32,9 @@ def get_channel_id(settings: Settings = Depends(get_settings)):
 
 
 def send_data_to_telegram(
-        bot: telegram.Bot,
-        channel_id: str,
-        scraped_data: Union[List[ScrapedData], ScrapedData],
+    bot: telegram.Bot,
+    channel_id: str,
+    scraped_data: Union[List[ScrapedData], ScrapedData],
 ):
     scraped_data = (
         scraped_data if isinstance(scraped_data, Iterable) else (scraped_data,)
@@ -50,10 +50,10 @@ def send_data_to_telegram(
 
 @app.post("/telegram-integration-web-hook/")
 async def accept_scraped_data(
-        scraped_data: Union[List[ScrapedData], ScrapedData],
-        background_tasks: BackgroundTasks,
-        bot: telegram.Bot = Depends(get_bot),
-        channel_id: str = Depends(get_channel_id),
+    scraped_data: Union[List[ScrapedData], ScrapedData],
+    background_tasks: BackgroundTasks,
+    bot: telegram.Bot = Depends(get_bot),
+    channel_id: str = Depends(get_channel_id),
 ):
     background_tasks.add_task(
         partial(send_data_to_telegram, bot, channel_id), scraped_data
