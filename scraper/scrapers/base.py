@@ -131,31 +131,38 @@ class Scraper(ABC):
         self.__configuration.status = ScraperConfiguration.INACTIVE_STATUS
         self.__configuration.save(update_fields=("status",))
 
+    @cached_property
+    @ensure_configuration()
+    def logger_prefix(self) -> str:
+        from scraper.models import ScraperConfiguration
+
+        pk = self.__configuration.pk
+        return f"[{ScraperConfiguration.__qualname__} with {pk=}]: "
+
+    def make_log_message(self, message: str) -> str:
+        return f"{self.logger_prefix}{message}"
+
     @abstractmethod
     def scrape(self) -> ScrapeResult:
         ...
 
     def step(self) -> ScrapeResult:
-        from scraper.models import ScraperConfiguration
-
         self.__reload_configuration()
-        pk = self.__configuration.pk
-        log_prefix = f"[{ScraperConfiguration.__qualname__} with {pk=}] "
         logger.info(f"Reloaded the configuration for {self.__class__.__qualname__}")
-        logger.info(f"{log_prefix}Verifying the resource is active.")
+        logger.info(self.make_log_message("Verifying the resource is active."))
         if not self.resource.is_active:
             raise RuntimeError(f"Cannot start scraping inactive {self.resource=}")
-        logger.info(f"{log_prefix}Verifying the scraper is active.")
+        logger.info(self.make_log_message("Verifying the scraper is active."))
         if not self.is_active:
             raise RuntimeError(
                 f"An attempt to start an inactive "
                 f"scraping algorithm with {self.scraper_name=}"
             )
-        logger.info(f"{log_prefix}Performing a scraping step.")
+        logger.info(self.make_log_message("Performing a scraping step."))
         scrape_result = self.scrape()
-        logger.info(f"{log_prefix}Updating a scraper state.")
+        logger.info(self.make_log_message("Updating a scraper state."))
         self.state = scrape_result.state
         if scrape_result.is_empty:
-            logger.info(f"{log_prefix}Deactivating a scraper state.")
+            logger.info(self.make_log_message("Deactivating a scraper state."))
             self.deactivate()
         return scrape_result
