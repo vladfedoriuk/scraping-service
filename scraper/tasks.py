@@ -56,7 +56,9 @@ def send_data(scraped_data_pk: int):
         client.post(
             url=integration.hook_url,
             request_kwargs={
-                "json": ScrapedDataSerializer(instance=scraped_data).data,
+                "json": ScrapedDataSerializer(
+                    instance=scraped_data, expand=["resource", "resource.topic"]
+                ).data,
             },
             client_kwargs={
                 "event_hooks": {
@@ -84,7 +86,9 @@ def send_batched_data(scraped_data_pk_list: list[int]):
         client.post(
             url=integration.hook_url,
             request_kwargs={
-                "json": ScrapedDataSerializer(scraped_data_batch, many=True).data,
+                "json": ScrapedDataSerializer(
+                    scraped_data_batch, many=True, expand=["resource", "resource.topic"]
+                ).data,
             },
             client_kwargs={
                 "event_hooks": {
