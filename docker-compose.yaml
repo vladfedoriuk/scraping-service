@@ -123,33 +123,61 @@ services:
         max-size: "1024k"
         max-file: "5"
 
-  flower:
+  scraping-service-dev: &backend
     build:
       target: dev
       args:
         DJANGO_ENV: development
-    container_name: flower
+    container_name: scraping-service-dev
     depends_on:
       - redis
-    restart: unless-stopped
-    command: celery -A scraping flower
+      - postgres
+    restart: always
+    command: >
+      sh -c "
+      python manage.py wait_for_db
+      && python manage.py migrate --no-input
+      && python manage.py createsuperuser_from_env
+      && python manage.py runserver
+      0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
-      - "${FLOWER_PORT:-5555}:5555"
+      - "${SCRAPING_SERVICE_DEV_PORT:-8000}:8000"
     networks:
       - scrapingnet
-    profiles: [ "observability" ]
+    profiles: [ "dev" ]
     env_file:
       - .env
-    environment:
-      CELERY_BROKER_URL: redis://redis
-      CELERY_RESULT_BACKEND: redis://redis
     logging:
       driver: "json-file"
       options:
         max-size: "1024k"
         max-file: "5"
+
+  celery-worker-dev:
+    <<: *backend
+    container_name: celery-worker-dev
+    restart: always
+    command: celery -A scraping flower
+    ports:
+      - "${SCRAPING_SERVICE_DEV_PORT:-8000}:8000"
+
+  flower:
+    <<: *backend
+    container_name: flower
+    depends_on:
+      - redis
+    restart: unless-stopped
+    command: celery -A scraping flower
+    ports:
+      - "${FLOWER_PORT:-5555}:5555"
+    networks:
+      - scrapingnet
+    profiles: [ "observability" ]
+    environment:
+      CELERY_BROKER_URL: redis://redis
+      CELERY_RESULT_BACKEND: redis://redis
 
   telegram:
     build:

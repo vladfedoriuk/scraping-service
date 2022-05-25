@@ -11,14 +11,10 @@ observability:  ### bring up all the observability related services.
 examples-integrations:  ### bring up the example integrations.
 	docker compose --profile examples-integrations up -d
 
+dev: services observability  ### spin up development server and the worker processes.
+	docker compose --profile dev up -d
+
 down:  ### bring down all the services.
 	docker compose down --remove-orphans
 
 
-# celery
-
-celery-worker:  ### spin up a celery worker process.
-	celery -A scraping worker -l info
-
-dev: services observability  ### spin up development server.
-	python manage.py runserver
