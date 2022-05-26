@@ -170,7 +170,7 @@ services:
     restart: unless-stopped
     command: celery -A scraping flower
     ports:
-      - "${FLOWER_PORT:-5555}:5555"
+      - "${HOST_FLOWER_PORT:-5555}:5555"
     networks:
       - scrapingnet
     profiles: [ "observability" ]
@@ -189,12 +189,14 @@ services:
       - ./examples/integrations/telegram:/app
     ports:
       - "${TELEGRAM_INTEGRATION_PORT:-8001}:8001"
-    profiles: [ "examples-integrations" ]
     environment:
       - TESTING=0
       - ENVIRONMENT=development
     env_file:
       - ./examples/integrations/telegram/.env
+    networks:
+      - scrapingnet
+    profiles: [ "examples-integrations" ]
     logging:
       driver: "json-file"
       options:

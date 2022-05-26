@@ -7,5 +7,5 @@ from scraper.utils.scrapers.mixins import ChromeDriverProvider
 __all__ = ("LaptopsOLXScraper",)
 
 
-class LaptopsOLXScraper(Scraper, ChromeDriverProvider, OLXScraperMixin):
+class LaptopsOLXScraper(OLXScraperMixin, ChromeDriverProvider, Scraper):
     scrape_data_countdown: timedelta = timedelta(minutes=1)

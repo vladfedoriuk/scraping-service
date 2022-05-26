@@ -20,6 +20,7 @@ flower = "^1.0.0"
 Markdown = "^3.3.7"
 django-filter = "^21.1"
 drf-flex-fields = "^0.9.8"
+drf-yasg = {extras = ["validation"], version = "^1.20.0"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"

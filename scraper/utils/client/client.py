@@ -56,6 +56,7 @@ class HttpClient:
                 self.logger.error(
                     f"An error occurred while requesting {exc.request.url!r}."
                 )
+                self.logger.exception(exc)
             except httpx.HTTPStatusError as exc:
                 self.logger.error(
                     f"Error response {exc.response.status_code} while requesting {exc.request.url!r}."
